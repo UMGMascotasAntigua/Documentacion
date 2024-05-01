@@ -1,0 +1,32 @@
+name: Markdown Pipeline
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v2
+            - name: Install MD Linter
+              run: npm install -g markdownlint-cli
+
+            - name: Lint Markdown Files
+              run: markdownlint .
+            
+            - name: Generate Preview
+              run: |
+                pandoc -o preview.html README.md
+
+    publish:
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Upload Preview
+              uses: actions/upload-artifact@v2
+              with:
+                name: preview
+                path: preview.html
